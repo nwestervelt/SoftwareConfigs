@@ -10,9 +10,6 @@
 # here, since multilingual X sessions would not work properly if LANG is over-
 # ridden in every subshell.
 
-# Adding My Binary Directory to PATH
-# export PATH=/home/noah/bin:$PATH
-
 # kdesrc-build #################################################################
 
 ## Add kdesrc-build to PATH

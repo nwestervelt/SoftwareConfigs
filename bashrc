@@ -11,12 +11,12 @@
 # ridden in every subshell.
 
 # Adding My Binary Directory to PATH
-export PATH=/home/noah/bin:$PATH
+# export PATH=/home/noah/bin:$PATH
 
 # kdesrc-build #################################################################
 
 ## Add kdesrc-build to PATH
-export PATH="$HOME/kde/src/kdesrc-build:$PATH"
+PATH="$HOME/kde/src/kdesrc-build:$PATH"
 
 
 ## Autocomplete for kdesrc-run

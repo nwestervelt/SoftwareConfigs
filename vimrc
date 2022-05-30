@@ -68,8 +68,3 @@ endif
 	set list
 	"show tabs as '>-' and trailing whitespace as '-'
 	set listchars=tab:>-,trail:-
-
-if has("autocmd")
-	" Enable filetype detection if vim supports autocmd
-	filetype off
-endif

@@ -1,4 +1,3 @@
 #!/usr/bin/bash
-mv $HOME/Downloads/osu.AppImage $HOME/My\ Games/osu.AppImage
+mv $HOME/Downloads/osu.AppImage $HOME/MyGames/osu.AppImage
 chmod u+x $HOME/My\ Games/osu.AppImage
-

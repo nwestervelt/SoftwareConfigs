@@ -59,7 +59,7 @@ endif
     "show line numbers relative to current line
     set relativenumber
     "use spaces instead of tab characters
-    set expandtab
+    "set expandtab
     "set number of characters autoindented after pressing return
     set shiftwidth=4
     "set number of characters indented when pressing tab

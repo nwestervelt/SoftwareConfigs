@@ -1,0 +1,28 @@
+#!/usr/bin/bash
+
+#loop while there are non-zero length arguments
+while [ -n "$1" ]; do
+
+	#do if the argument is a flac file
+	if [[ "$1" =~ ^..*\.flac$ ]]; then
+
+		#store title in title
+		title="$(metaflac --show-tag=title "$1")"
+		title="${title:6}"
+
+		#store artist in artist
+		artist="$(metaflac --show-tag=artist "$1")"
+		artist="${artist:7}"
+
+		#store number in number, suppress errors
+		number=$(metaflac --show-tag=tracknumber "$1" 2> /dev/null)
+		if [ -n number ]; then
+			number="${number:12}"
+		fi
+
+		#create the file name
+		name="$(printf "%.2d - %s - %s" "$number" "$artist" "$title")"
+		mv "$1" "$name.flac"
+	fi
+	shift
+done

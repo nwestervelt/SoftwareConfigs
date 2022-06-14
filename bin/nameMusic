@@ -1,5 +1,26 @@
 #!/usr/bin/bash
 
+help()
+{
+	echo
+	echo "This program will rename music files with the format 'tracknumber - artist - title'."
+	echo
+	echo "Provide the music files you wish to rename to this program as arguments."
+	echo
+}
+
+#process options
+while getopts ":h" option; do
+	case $option in
+		h) #print help
+			help
+			exit;;
+		\?) #invalid option
+			echo "Error: Invalid option"
+			exit;;
+	esac
+done
+
 #loop while there are non-zero length arguments
 while [ -n "$1" ]; do
 

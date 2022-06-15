@@ -11,4 +11,4 @@
 # ridden in every subshell.
 
 # Set the shell prompt
-PS1="\u@\h:\W$ "
+PS1="[\u@\h:\W]$ "

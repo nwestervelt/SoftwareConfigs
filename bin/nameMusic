@@ -27,7 +27,7 @@ while [ -n "$1" ]; do
 	#do if the argument is a flac file
 	#and isn't already formatted
 	if [[ "$1" =~ '.*\.flac$' ]] ; then
-		if [[ ! "$1" =~ '^[:digit:][:digit:] - .* - .*\.flac$' ]] ; then
+		if [[ ! "$1" =~ '^[:digit:]{2} - .* - .*\.flac$' ]] ; then
 
 			#store title in title
 			title="$(metaflac --show-tag=title "$1")"

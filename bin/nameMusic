@@ -2,51 +2,95 @@
 
 help()
 {
-	echo
-	echo "This program will rename music files with the format 'tracknumber - artist - title'."
-	echo
-	echo "Provide the music files you wish to rename to this program as arguments."
-	echo
+    echo
+    echo "This program will rename music files with the format 'tracknumber - artist - title'."
+    echo
+    echo "Provide the music files you wish to rename to this program as arguments."
+    echo
+}
+
+flacFormat()
+{
+    #store title
+    local title="$(metaflac --show-tag=title "$1")"
+    #remove first 6 characters from title
+    local title="${title:6}"
+
+    #store artist
+    local artist="$(metaflac --show-tag=artist "$1")"
+    #remove first 7 characters from artist
+    local artist="${artist:7}"
+
+    #store tracknumber
+    local tracknumber="$(metaflac --show-tag=tracknumber "$1" 2> /dev/null)"
+    if [ -n tracknumber ]; then
+        local tracknumber="${tracknumber:12}"
+    fi
+
+    #create file name
+    local name="$(printf "%.2d - %s - %s" "$tracknumber" "$artist" "$title")"
+    mv "$1" "$name.flac"
+}
+
+mp3Format()
+{
+    #store title
+    local title="$(ffprobe -show_format "$1" 2> /dev/null | grep "title")"
+    #remove extra data in title
+    local title="${title:10}"
+
+    #store artist
+    local artist="$(ffprobe -show_format "$1" 2> /dev/null | grep "^TAG:artist")"
+    #remove extra data in artist
+    local artist="${artist:11}"
+
+    #store tracknumber
+    local tracknumber="$(ffprobe -show_format "$1" 2> /dev/null | grep "track")"
+    #remove extra data in tracknumber
+    local tracknumber="${tracknumber:10}"
+
+    #create file name
+    local name="$(printf "%.2d - %s - %s" "$tracknumber" "$artist" "$title")"
+    mv "$1" "$name.mp3"
 }
 
 #process options
-while getopts ":h" option; do
-	case $option in
-		h) #print help
-			help
-			exit;;
-		\?) #invalid option
-			echo "Error: Invalid option"
-			exit;;
-	esac
+options="$(getopt -n "nameMusic" -o h -l help -- "$@")"
+
+#put formatted options into commandline options
+eval set -- "$options"
+
+while : ; do
+    case $1 in
+        -h|--help) #print help
+            help
+            exit;;
+        --) #end of options
+            shift
+            break;;
+    esac
 done
 
-#loop while there are non-zero length arguments
+#main program
+#non-zero length arguments?
 while [ -n "$1" ]; do
 
-	#do if the argument is a flac file
-	#and isn't already formatted
-	if [[ "$1" =~ '.*\.flac$' ]] ; then
-		if [[ ! "$1" =~ '^[:digit:]{2} - .* - .*\.flac$' ]] ; then
+    #not already formatted?
+    pat='^[:digit:]{2} - .* - .*\..*$'
+    if [[ ! "$1" =~ $pat ]] ; then
 
-			#store title in title
-			title="$(metaflac --show-tag=title "$1")"
-			title="${title:6}"
+        #flac file?
+        pat='flac$'
+        if [[ "$1" =~ $pat ]] ; then
+            flacFormat "$1"
+        fi
 
-			#store artist in artist
-			artist="$(metaflac --show-tag=artist "$1")"
-			artist="${artist:7}"
-
-			#store number in number, suppress errors
-			number=$(metaflac --show-tag=tracknumber "$1" 2> /dev/null)
-			if [ -n number ]; then
-				number="${number:12}"
-			fi
-
-			#create the file name
-			name="$(printf "%.2d - %s - %s" "$number" "$artist" "$title")"
-			mv "$1" "$name.flac"
-		fi
-	fi
-	shift
+        #mp3 file?
+        pat='mp3$'
+        if [[ "$1" =~ $pat ]] ; then
+            mp3Format "$1"
+        fi
+    fi
+    #shift to next argument
+    shift
 done

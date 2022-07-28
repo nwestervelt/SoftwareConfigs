@@ -1,11 +1,41 @@
 #!/usr/bin/bash
 
+main()
+{
+    #$1 empty?
+    if [ -z "$1" ] ; then
+        return
+    fi
+    #$1 a directory?
+    if [ -d "$1" ] ; then
+        cd "$1"
+        echo "Entered dir $1"
+        main *
+        cd "$OLDPWD"
+        echo "Exited dir $1"
+    fi
+    #not already formatted?
+    if [[ ! "$1" =~ $PAT ]] ; then
+        #$1 a flac file?
+        if [[ "$1" =~ flac$ ]] ; then
+            flacFormat "$1"
+        fi
+        #$1 a mp3 file?
+        if [[ "$1" =~ mp3$ ]] ; then
+            mp3Format "$1"
+        fi
+    fi
+    shift
+    main "$@"
+}
+
 help()
 {
     echo
     echo "This program will rename music files with the format 'tracknumber - artist - title'."
     echo
     echo "Provide the music files you wish to rename to this program as arguments."
+    echo "Also works with directories, as long as the argument doesn't have a '/' on the end."
     echo
 }
 
@@ -28,8 +58,9 @@ flacFormat()
     fi
 
     #create file name
-    local name="$(printf "%.2d - %s - %s" "$tracknumber" "$artist" "$title")"
-    mv "$1" "$name.flac"
+    local name="$(printf "%.2d - %s - %s.flac" "$tracknumber" "$artist" "$title")"
+    mv "$1" "$name"
+    echo "Renamed $1 to $name"
 }
 
 mp3Format()
@@ -50,8 +81,9 @@ mp3Format()
     local tracknumber="${tracknumber:10}"
 
     #create file name
-    local name="$(printf "%.2d - %s - %s" "$tracknumber" "$artist" "$title")"
-    mv "$1" "$name.mp3"
+    local name="$(printf "%.2d - %s - %s.mp3" "$tracknumber" "$artist" "$title")"
+    mv "$1" "$name"
+    echo "Renamed $1 to $name"
 }
 
 #process options
@@ -60,7 +92,7 @@ options="$(getopt -n "nameMusic" -o h -l help -- "$@")"
 #put formatted options into commandline options
 eval set -- "$options"
 
-while : ; do
+while true ; do
     case $1 in
         -h|--help) #print help
             help
@@ -71,26 +103,7 @@ while : ; do
     esac
 done
 
-#main program
-#non-zero length arguments?
-while [ -n "$1" ]; do
+#pattern used to determine if a file is already formatted.
+PAT='^[[:digit:]]{2}[[:space:]]\-[[:space:]].*[[:space:]]\-[[:space:]].*\..*$'
+main "$@"
 
-    #not already formatted?
-    pat='^[:digit:]{2} - .* - .*\..*$'
-    if [[ ! "$1" =~ $pat ]] ; then
-
-        #flac file?
-        pat='flac$'
-        if [[ "$1" =~ $pat ]] ; then
-            flacFormat "$1"
-        fi
-
-        #mp3 file?
-        pat='mp3$'
-        if [[ "$1" =~ $pat ]] ; then
-            mp3Format "$1"
-        fi
-    fi
-    #shift to next argument
-    shift
-done

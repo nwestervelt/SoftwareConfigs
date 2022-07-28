@@ -1,4 +1,4 @@
-This repository contains information on the configuration of various pieces of software I use.
+This repository contains information on the configuration of various pieces of software I use on Linux.
 
 To install ale (vim parser), clone the below repo into '~/.vim/pack/git-plugins/start/ale'.
 

@@ -11,7 +11,7 @@ main()
         cd "$1"
         echo "Entered dir $1"
         main *
-        cd "$OLDPWD"
+        cd ".."
         echo "Exited dir $1"
     fi
     #not already formatted?
@@ -35,7 +35,7 @@ help()
     echo "This program will rename music files with the format 'tracknumber - artist - title'."
     echo
     echo "Provide the music files you wish to rename to this program as arguments."
-    echo "Also works with directories, as long as the argument doesn't have a '/' on the end."
+    echo "Also works with directories."
     echo
 }
 

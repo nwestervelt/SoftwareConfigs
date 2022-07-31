@@ -11,7 +11,7 @@
 # ridden in every subshell.
 
 # Set the shell prompt
-export PS1="[\u@\h:\W]$ "
+export PS1="\[\033[0;37m\]\[\033[0;44m\][\u@\h:\W]$\[\033[0m\] "
 
 # Create alias for upgrading software on openSUSE: Tumbleweed systems
 os=$(cat /etc/os-release | grep ^NAME | sed s/^NAME\=// | sed s/\"//g)

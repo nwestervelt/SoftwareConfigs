@@ -43,12 +43,12 @@ flacFormat()
 {
     #store title
     local title="$(metaflac --show-tag=title "$1")"
-    #remove first 6 characters from title
+    #truncate title
     local title="${title:6}"
 
     #store artist
     local artist="$(metaflac --show-tag=artist "$1")"
-    #remove first 7 characters from artist
+    #truncate artist
     local artist="${artist:7}"
 
     #store tracknumber
@@ -59,6 +59,8 @@ flacFormat()
 
     #create file name
     local name="$(printf "%.2d - %s - %s.flac" "$tracknumber" "$artist" "$title")"
+    #replace '/'
+    local name="$(echo "$name" | sed 's/\//\-/g')"
     mv "$1" "$name"
     echo "Renamed $1 to $name"
 }
@@ -67,12 +69,12 @@ mp3Format()
 {
     #store title
     local title="$(ffprobe -show_format "$1" 2> /dev/null | grep "title")"
-    #remove extra data in title
+    #truncate title
     local title="${title:10}"
 
     #store artist
     local artist="$(ffprobe -show_format "$1" 2> /dev/null | grep "^TAG:artist")"
-    #remove extra data in artist
+    #truncate artist
     local artist="${artist:11}"
 
     #store tracknumber
@@ -82,6 +84,8 @@ mp3Format()
 
     #create file name
     local name="$(printf "%.2d - %s - %s.mp3" "$tracknumber" "$artist" "$title")"
+    #replace '/'
+    local name="$(echo "$name" | sed 's/\//\-/g')"
     mv "$1" "$name"
     echo "Renamed $1 to $name"
 }

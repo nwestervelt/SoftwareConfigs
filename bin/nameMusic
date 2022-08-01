@@ -41,18 +41,22 @@ help()
 
 flacFormat()
 {
+    #store tag information
+    local information="$(metaflac --export-tags-to=- "$1")"
+
     #store title
-    local title="$(metaflac --show-tag=title "$1")"
+    local title="$(echo "$information" | grep "^TITLE")"
     #truncate title
     local title="${title:6}"
 
     #store artist
-    local artist="$(metaflac --show-tag=artist "$1")"
+    local artist="$(echo "$information" | grep "^ARTIST")"
     #truncate artist
     local artist="${artist:7}"
 
     #store tracknumber
-    local tracknumber="$(metaflac --show-tag=tracknumber "$1" 2> /dev/null)"
+    local tracknumber="$(echo "$information" | grep "^TRACKNUMBER")"
+    #truncate tracknumber if exists
     if [ -n tracknumber ]; then
         local tracknumber="${tracknumber:12}"
     fi
@@ -67,20 +71,25 @@ flacFormat()
 
 mp3Format()
 {
+    #store tag information
+    local information="$(ffprobe -show_format 2> /dev/null "$1")"
+
     #store title
-    local title="$(ffprobe -show_format "$1" 2> /dev/null | grep "title")"
+    local title="$(echo "$information" | grep "^TAG:title")"
     #truncate title
     local title="${title:10}"
 
     #store artist
-    local artist="$(ffprobe -show_format "$1" 2> /dev/null | grep "^TAG:artist")"
+    local artist="$(echo "$information" | grep "^TAG:artist")"
     #truncate artist
     local artist="${artist:11}"
 
     #store tracknumber
-    local tracknumber="$(ffprobe -show_format "$1" 2> /dev/null | grep "track")"
-    #remove extra data in tracknumber
-    local tracknumber="${tracknumber:10}"
+    local tracknumber="$(echo "$information" | grep "^TAG:track")"
+    #truncate tracknumber if exists
+    if [ -n tracknumber ]; then
+        local tracknumber="${tracknumber:10}"
+    fi
 
     #create file name
     local name="$(printf "%.2d - %s - %s.mp3" "$tracknumber" "$artist" "$title")"

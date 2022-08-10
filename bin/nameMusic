@@ -14,15 +14,19 @@ main()
         cd ".."
         echo "Exited dir $1"
     fi
+    #separate old name from directory
+    oldName="$(basename "$1")"
+    dir="$(echo "$1" | sed s/"$oldName"$//)"
+
     #not already formatted?
-    if [[ ! "$1" =~ $PAT ]] ; then
+    if [[ ! "$oldName" =~ $PAT ]] ; then
         #$1 a flac file?
-        if [[ "$1" =~ flac$ ]] ; then
-            flacFormat "$1"
+        if [[ "$oldName" =~ flac$ ]] ; then
+            flacFormat
         fi
         #$1 a mp3 file?
-        if [[ "$1" =~ mp3$ ]] ; then
-            mp3Format "$1"
+        if [[ "$oldName" =~ mp3$ ]] ; then
+            mp3Format
         fi
     fi
     shift
@@ -42,61 +46,61 @@ help()
 flacFormat()
 {
     #store tag information
-    local information="$(metaflac --export-tags-to=- "$1")"
+    information="$(metaflac --export-tags-to=- "$dir""$oldName")"
 
     #store title
-    local title="$(echo "$information" | grep "^TITLE")"
+    title="$(echo "$information" | grep "^TITLE")"
     #truncate title
-    local title="${title:6}"
+    title="${title:6}"
 
     #store artist
-    local artist="$(echo "$information" | grep "^ARTIST")"
+    artist="$(echo "$information" | grep "^ARTIST")"
     #truncate artist
-    local artist="${artist:7}"
+    artist="${artist:7}"
 
     #store tracknumber
-    local tracknumber="$(echo "$information" | grep "^TRACKNUMBER")"
+    tracknumber="$(echo "$information" | grep "^TRACKNUMBER")"
     #truncate tracknumber if exists
-    if [ -n tracknumber ]; then
-        local tracknumber="${tracknumber:12}"
+    if [ -n tracknumber ] ; then
+        tracknumber="${tracknumber:12}"
     fi
-
-    #create file name
-    local name="$(printf "%.2d - %s - %s.flac" "$tracknumber" "$artist" "$title")"
-    #replace '/'
-    local name="$(echo "$name" | sed 's/\//\-/g')"
-    mv "$1" "$name"
-    echo "Renamed $1 to $name"
+    move
 }
 
 mp3Format()
 {
     #store tag information
-    local information="$(ffprobe -show_format 2> /dev/null "$1")"
+    information="$(ffprobe -show_format 2> /dev/null "$1")"
 
     #store title
-    local title="$(echo "$information" | grep "^TAG:title")"
+    title="$(echo "$information" | grep "^TAG:title")"
     #truncate title
-    local title="${title:10}"
+    title="${title:10}"
 
     #store artist
-    local artist="$(echo "$information" | grep "^TAG:artist")"
+    artist="$(echo "$information" | grep "^TAG:artist")"
     #truncate artist
-    local artist="${artist:11}"
+    artist="${artist:11}"
 
     #store tracknumber
-    local tracknumber="$(echo "$information" | grep "^TAG:track")"
+    tracknumber="$(echo "$information" | grep "^TAG:track")"
     #truncate tracknumber if exists
-    if [ -n tracknumber ]; then
-        local tracknumber="${tracknumber:10}"
+    if [ -n tracknumber ] ; then
+        tracknumber="${tracknumber:10}"
     fi
+    move
+}
 
+move()
+{
     #create file name
-    local name="$(printf "%.2d - %s - %s.mp3" "$tracknumber" "$artist" "$title")"
+    newName="$(printf "%.2d - %s - %s.flac" "$tracknumber" "$artist" "$title")"
     #replace '/'
-    local name="$(echo "$name" | sed 's/\//\-/g')"
-    mv "$1" "$name"
-    echo "Renamed $1 to $name"
+    newName="$(echo "$newName" | sed 's/\//\-/g')"
+
+    #move file
+    mv "$dir""$oldName" "$dir""$newName"
+    echo "Renamed $dir$oldName to $newName"
 }
 
 #process options
@@ -115,8 +119,8 @@ while true ; do
             break;;
     esac
 done
-
 #pattern used to determine if a file is already formatted.
 PAT='^[[:digit:]]{2}[[:space:]]\-[[:space:]].*[[:space:]]\-[[:space:]].*\..*$'
+#initial main funcion call
 main "$@"
 

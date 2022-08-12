@@ -1,12 +1,22 @@
 #!/usr/bin/bash
 
+help()
+{
+    echo
+    echo "This program will rename music files with the format 'tracknumber - artist - title'."
+    echo
+    echo "Provide the music files you wish to rename to this program as arguments."
+    echo "Also works with directories."
+    echo
+}
+
 main()
 {
-    #$1 empty?
+    #is empty?
     if [ -z "$1" ] ; then
         return
     fi
-    #$1 a directory?
+    #is a directory?
     if [ -d "$1" ] ; then
         cd "$1"
         echo "Entered dir $1"
@@ -20,27 +30,17 @@ main()
 
     #not already formatted?
     if [[ ! "$oldName" =~ $PAT ]] ; then
-        #$1 a flac file?
+        #is a flac file?
         if [[ "$oldName" =~ flac$ ]] ; then
             flacFormat
         fi
-        #$1 a mp3 file?
+        #is a mp3 file?
         if [[ "$oldName" =~ mp3$ ]] ; then
             mp3Format
         fi
     fi
     shift
     main "$@"
-}
-
-help()
-{
-    echo
-    echo "This program will rename music files with the format 'tracknumber - artist - title'."
-    echo
-    echo "Provide the music files you wish to rename to this program as arguments."
-    echo "Also works with directories."
-    echo
 }
 
 flacFormat()
@@ -95,7 +95,8 @@ move()
 {
     #create file name
     newName="$(printf "%.2d - %s - %s.flac" "$tracknumber" "$artist" "$title")"
-    #replace '/'
+
+    #handle '/' in file metadata
     newName="$(echo "$newName" | sed 's/\//\-/g')"
 
     #move file
@@ -120,7 +121,7 @@ while true ; do
     esac
 done
 #pattern used to determine if a file is already formatted.
-PAT='^[[:digit:]]{2}[[:space:]]\-[[:space:]].*[[:space:]]\-[[:space:]].*\..*$'
+PAT='^[[:digit:]]{2} \- .* \- .*\..*$'
 #initial main funcion call
 main "$@"
 

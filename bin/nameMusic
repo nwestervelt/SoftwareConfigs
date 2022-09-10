@@ -47,6 +47,7 @@ flacFormat()
 {
     #store tag information
     information="$(metaflac --export-tags-to=- "$dir""$oldName")"
+    format="flac"
 
     #store title
     title="$(echo "$information" | grep "^TITLE")"
@@ -70,7 +71,8 @@ flacFormat()
 mp3Format()
 {
     #store tag information
-    information="$(ffprobe -show_format 2> /dev/null "$1")"
+    information="$(ffprobe -show_format "$dir""$oldName" 2> /dev/null)"
+    format="mp3"
 
     #store title
     title="$(echo "$information" | grep "^TAG:title")"
@@ -94,7 +96,7 @@ mp3Format()
 move()
 {
     #create file name
-    newName="$(printf "%.2d - %s - %s.flac" "$tracknumber" "$artist" "$title")"
+    newName="$(printf "%.2d - %s - %s.%s" "$tracknumber" "$artist" "$title" "$format")"
 
     #handle '/' in file metadata
     newName="$(echo "$newName" | sed 's/\//\-/g')"

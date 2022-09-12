@@ -68,3 +68,9 @@ endif
 	set list
 	"show tabs as '>-' and trailing whitespace as '-'
 	set listchars=tab:>-,trail:-
+    "always show status line
+    set laststatus=2
+    "show file encoding in status line
+    if has("statusline")
+        set statusline=%<%f\ %h%m%r%=%{\"[\".(&fenc==\"\"?&enc:&fenc).((exists(\"+bomb\")\ &&\ &bomb)?\",B\":\"\").\"]\ \"}%k\ %-14.(%l,%c%V%)\ %P
+    endif

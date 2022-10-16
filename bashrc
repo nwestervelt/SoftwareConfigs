@@ -1,5 +1,5 @@
 # Set the shell prompt
-export PS1="\[\033[37m\]\[\033[1;44m\][\u@\h:\W]$\[\033[0m\] "
+export PS1="[\u@\h:\W]$ "
 
 # Create alias for upgrading software on openSUSE: Tumbleweed systems
 os=$(cat /etc/os-release | grep ^NAME | sed s/^NAME\=// | sed s/\"//g)

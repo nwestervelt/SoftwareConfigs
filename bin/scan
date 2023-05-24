@@ -1,4 +1,0 @@
-#!/usr/bin/sudo bash
-scanimage --mode color --resolution 300 -o $1
-chown $USER:users $1
-

@@ -1,7 +1,6 @@
 #!/usr/bin/bash
 
-help()
-{
+help() {
     echo
     echo "This program will rename music files with the format 'tracknumber - artist - title'."
     echo
@@ -10,8 +9,7 @@ help()
     echo
 }
 
-main()
-{
+main() {
     #is empty?
     if [ -z "$1" ] ; then
         return
@@ -19,32 +17,27 @@ main()
     #is a directory?
     if [ -d "$1" ] ; then
         cd "$1"
-        echo "Entered dir $1"
+        echo "Entered directory \"$1\""
         main *
         cd ".."
-        echo "Exited dir $1"
+        echo "Exited directory \"$1\""
     fi
     #separate old name from directory
     oldName="$(basename "$1")"
     dir="$(echo "$1" | sed s/"$oldName"$//)"
 
-    #not already formatted?
-    if [[ ! "$oldName" =~ $PAT ]] ; then
-        #is a flac file?
-        if [[ "$oldName" =~ flac$ ]] ; then
-            flacFormat
-        fi
-        #is a mp3 file?
-        if [[ "$oldName" =~ mp3$ ]] ; then
-            mp3Format
-        fi
+    #is a flac file?
+    if [[ "$oldName" =~ flac$ ]] ; then
+        flacFormat
+    #is a mp3 file?
+    elif [[ "$oldName" =~ mp3$ ]] ; then
+        mp3Format
     fi
     shift
     main "$@"
 }
 
-flacFormat()
-{
+flacFormat() {
     #store tag information
     information="$(metaflac --export-tags-to=- "$dir""$oldName")"
     format="flac"
@@ -68,8 +61,7 @@ flacFormat()
     move
 }
 
-mp3Format()
-{
+mp3Format() {
     #store tag information
     information="$(ffprobe -show_format "$dir""$oldName" 2> /dev/null)"
     format="mp3"
@@ -93,8 +85,7 @@ mp3Format()
     move
 }
 
-move()
-{
+move() {
     #create file name
     newName="$(printf "%.2d - %s - %s.%s" "$tracknumber" "$artist" "$title" "$format")"
 
@@ -102,8 +93,10 @@ move()
     newName="$(echo "$newName" | sed 's/\//\-/g')"
 
     #move file
-    mv "$dir""$oldName" "$dir""$newName"
-    echo "Renamed $dir$oldName to $newName"
+    if [ "$oldName" != "$newName" ] ; then
+        mv "$dir""$oldName" "$dir""$newName" &> /dev/null
+        echo "Renamed \"$dir$oldName\" to \"$newName\""
+    fi
 }
 
 #process options
@@ -122,8 +115,6 @@ while true ; do
             break;;
     esac
 done
-#pattern used to determine if a file is already formatted.
-PAT='^[[:digit:]]{2} \- .* \- .*\..*$'
 #initial main funcion call
 main "$@"
 

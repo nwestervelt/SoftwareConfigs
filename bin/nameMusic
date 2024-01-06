@@ -86,6 +86,10 @@ mp3Format() {
 }
 
 move() {
+    #remove leading 0's
+    if [[ "$tracknumber" =~ ^0.*$ ]] ; then
+        tracknumber="${tracknumber:1}"
+    fi
     #create file name
     newName="$(printf "%.2d - %s - %s.%s" "$tracknumber" "$artist" "$title" "$format")"
 

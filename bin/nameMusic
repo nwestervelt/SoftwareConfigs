@@ -24,7 +24,9 @@ main() {
     fi
     #separate old name from directory
     oldName="$(basename "$1")"
-    dir="$(echo "$1" | sed s/"$oldName"$//)"
+
+    lengthOfDirectoryString=$((${#1}-${#oldName}))
+    dir="${1:0:$lengthOfDirectoryString}"
 
     #is a flac file?
     if [[ "$oldName" =~ flac$ ]] ; then
@@ -39,21 +41,21 @@ main() {
 
 flacFormat() {
     #store tag information
-    information="$(metaflac --export-tags-to=- "$dir""$oldName")"
+    information="$(metaflac --export-tags-to=- "$dir""$oldName" 2> /dev/null)"
     format="flac"
 
     #store title
-    title="$(echo "$information" | grep "^TITLE")"
+    title="$(echo "$information" | grep -i "^title")"
     #truncate title
     title="${title:6}"
 
     #store artist
-    artist="$(echo "$information" | grep "^ARTIST")"
+    artist="$(echo "$information" | grep -i "^artist")"
     #truncate artist
     artist="${artist:7}"
 
     #store tracknumber
-    tracknumber="$(echo "$information" | grep "^TRACKNUMBER")"
+    tracknumber="$(echo "$information" | grep -i "^tracknumber")"
     #truncate tracknumber if exists
     if [ -n tracknumber ] ; then
         tracknumber="${tracknumber:12}"
@@ -67,17 +69,17 @@ mp3Format() {
     format="mp3"
 
     #store title
-    title="$(echo "$information" | grep "^TAG:title")"
+    title="$(echo "$information" | grep -i "^tag:title=")"
     #truncate title
     title="${title:10}"
 
     #store artist
-    artist="$(echo "$information" | grep "^TAG:artist")"
+    artist="$(echo "$information" | grep -i "^tag:artist=")"
     #truncate artist
     artist="${artist:11}"
 
     #store tracknumber
-    tracknumber="$(echo "$information" | grep "^TAG:track")"
+    tracknumber="$(echo "$information" | grep -i "^tag:track=")"
     #truncate tracknumber if exists
     if [ -n tracknumber ] ; then
         tracknumber="${tracknumber:10}"

@@ -1,108 +1,108 @@
 #!/usr/bin/bash
 
 help() {
-    echo
-    echo "This program will rename music files with the format 'tracknumber - artist - title'."
-    echo
-    echo "Provide the music files you wish to rename to this program as arguments."
-    echo "Also works with directories."
-    echo
+	echo
+	echo "This program will rename music files with the format 'tracknumber - artist - title'."
+	echo
+	echo "Provide the music files you wish to rename to this program as arguments."
+	echo "Also works with directories."
+	echo
 }
 
 main() {
-    #is empty?
-    if [ -z "$1" ] ; then
-        return
-    fi
-    #is a directory?
-    if [ -d "$1" ] ; then
-        cd "$1"
-        echo "Entered directory \"$1\""
-        main *
-        cd ".."
-        echo "Exited directory \"$1\""
-    fi
-    #separate old name from directory
-    oldName="$(basename "$1")"
+	#is empty?
+	if [ -z "$1" ] ; then
+		return
+	fi
+	#is a directory?
+	if [ -d "$1" ] ; then
+		cd "$1"
+		echo "Entered directory \"$1\""
+		main *
+		cd ".."
+		echo "Exited directory \"$1\""
+	fi
+	#separate old name from directory
+	oldName="$(basename "$1")"
 
-    lengthOfDirectoryString=$((${#1}-${#oldName}))
-    dir="${1:0:$lengthOfDirectoryString}"
+	lengthOfDirectoryString=$((${#1}-${#oldName}))
+	dir="${1:0:$lengthOfDirectoryString}"
 
-    #is a flac file?
-    if [[ "$oldName" =~ flac$ ]] ; then
-        flacFormat
-    #is a mp3 file?
-    elif [[ "$oldName" =~ mp3$ ]] ; then
-        mp3Format
-    fi
-    shift
-    main "$@"
+	#is a flac file?
+	if [[ "$oldName" =~ flac$ ]] ; then
+		flacFormat
+	#is a mp3 file?
+	elif [[ "$oldName" =~ mp3$ ]] ; then
+		mp3Format
+	fi
+	shift
+	main "$@"
 }
 
 flacFormat() {
-    #store tag information
-    information="$(metaflac --export-tags-to=- "$dir""$oldName" 2> /dev/null)"
-    format="flac"
+	#store tag information
+	information="$(metaflac --export-tags-to=- "$dir""$oldName" 2> /dev/null)"
+	format="flac"
 
-    #store title
-    title="$(echo "$information" | grep -i "^title")"
-    #truncate title
-    title="${title:6}"
+	#store title
+	title="$(echo "$information" | grep -i "^title")"
+	#truncate title
+	title="${title:6}"
 
-    #store artist
-    artist="$(echo "$information" | grep -i "^artist")"
-    #truncate artist
-    artist="${artist:7}"
+	#store artist
+	artist="$(echo "$information" | grep -i "^artist")"
+	#truncate artist
+	artist="${artist:7}"
 
-    #store tracknumber
-    tracknumber="$(echo "$information" | grep -i "^tracknumber")"
-    #truncate tracknumber if exists
-    if [ -n tracknumber ] ; then
-        tracknumber="${tracknumber:12}"
-    fi
-    move
+	#store tracknumber
+	tracknumber="$(echo "$information" | grep -i "^tracknumber")"
+	#truncate tracknumber if exists
+	if [ -n tracknumber ] ; then
+		tracknumber="${tracknumber:12}"
+	fi
+	move
 }
 
 mp3Format() {
-    #store tag information
-    information="$(ffprobe -show_format "$dir""$oldName" 2> /dev/null)"
-    format="mp3"
+	#store tag information
+	information="$(ffprobe -show_format "$dir""$oldName" 2> /dev/null)"
+	format="mp3"
 
-    #store title
-    title="$(echo "$information" | grep -i "^tag:title=")"
-    #truncate title
-    title="${title:10}"
+	#store title
+	title="$(echo "$information" | grep -i "^tag:title=")"
+	#truncate title
+	title="${title:10}"
 
-    #store artist
-    artist="$(echo "$information" | grep -i "^tag:artist=")"
-    #truncate artist
-    artist="${artist:11}"
+	#store artist
+	artist="$(echo "$information" | grep -i "^tag:artist=")"
+	#truncate artist
+	artist="${artist:11}"
 
-    #store tracknumber
-    tracknumber="$(echo "$information" | grep -i "^tag:track=")"
-    #truncate tracknumber if exists
-    if [ -n tracknumber ] ; then
-        tracknumber="${tracknumber:10}"
-    fi
-    move
+	#store tracknumber
+	tracknumber="$(echo "$information" | grep -i "^tag:track=")"
+	#truncate tracknumber if exists
+	if [ -n tracknumber ] ; then
+		tracknumber="${tracknumber:10}"
+	fi
+	move
 }
 
 move() {
-    #remove leading 0's
-    if [[ "$tracknumber" =~ ^0.*$ ]] ; then
-        tracknumber="${tracknumber:1}"
-    fi
-    #create file name
-    newName="$(printf "%.2d - %s - %s.%s" "$tracknumber" "$artist" "$title" "$format")"
+	#remove leading 0's
+	if [[ "$tracknumber" =~ ^0.*$ ]] ; then
+		tracknumber="${tracknumber:1}"
+	fi
+	#create file name
+	newName="$(printf "%.2d - %s - %s.%s" "$tracknumber" "$artist" "$title" "$format")"
 
-    #handle '/' in file metadata
-    newName="$(echo "$newName" | sed 's/\//\-/g')"
+	#handle '/' in file metadata
+	newName="$(echo "$newName" | sed 's/\//\-/g')"
 
-    #move file
-    if [ "$oldName" != "$newName" ] ; then
-        mv "$dir""$oldName" "$dir""$newName" &> /dev/null
-        echo "Renamed \"$dir$oldName\" to \"$newName\""
-    fi
+	#move file
+	if [ "$oldName" != "$newName" ] ; then
+		mv "$dir""$oldName" "$dir""$newName" &> /dev/null
+		echo "Renamed \"$dir$oldName\" to \"$newName\""
+	fi
 }
 
 #process options
@@ -112,14 +112,14 @@ options="$(getopt -n "nameMusic" -o h -l help -- "$@")"
 eval set -- "$options"
 
 while true ; do
-    case $1 in
-        -h|--help) #print help
-            help
-            exit;;
-        --) #end of options
-            shift
-            break;;
-    esac
+	case $1 in
+		-h|--help) #print help
+			help
+			exit;;
+		--) #end of options
+			shift
+			break;;
+	esac
 done
 #initial main funcion call
 main "$@"

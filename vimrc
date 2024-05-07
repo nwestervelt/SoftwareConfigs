@@ -1,14 +1,14 @@
 " An example for a vimrc file.
 "
-" Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last change:	2019 Dec 17
+" Maintainer:    Bram Moolenaar <Bram@vim.org>
+" Last change:    2019 Dec 17
 "
 " To use it, copy it to
-"		   for Unix:  ~/.vimrc
-"		  for Amiga:  s:.vimrc
-"	 for MS-Windows:  $VIM\_vimrc
-"		  for Haiku:  ~/config/settings/vim/vimrc
-"		for OpenVMS:  sys$login:.vimrc
+"           for Unix:  ~/.vimrc
+"          for Amiga:  s:.vimrc
+"     for MS-Windows:  $VIM\_vimrc
+"          for Haiku:  ~/config/settings/vim/vimrc
+"        for OpenVMS:  sys$login:.vimrc
 
 " When started as "evim", evim.vim will already have done these settings, bail
 " out.
@@ -20,11 +20,11 @@ endif
 source $VIMRUNTIME/defaults.vim
 
 if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
+  set nobackup        " do not keep a backup file, use versions instead
 else
-  set backup		" keep a backup file (restore to previous version)
+  set backup        " keep a backup file (restore to previous version)
 "  if has('persistent_undo')
-"	set undofile	" keep an undo file (undo changes after closing), commented out
+"    set undofile    " keep an undo file (undo changes after closing), commented out
 "  endif
 endif
 
@@ -52,21 +52,21 @@ if has('syntax') && has('eval')
 endif
 
 " custom settings
-	"show cursor position (line and column number) bottom right of screen
-	set ruler
-	"show absolute line numbers (only on current line when with relativenumber)
-	set number
-	"show line numbers relative to current line
-	set relativenumber
-	"use spaces instead of tab characters
-	"set expandtab
-	"set number of characters autoindented after pressing return
-	set shiftwidth=4
-	"set number of characters indented when pressing tab
-	set tabstop=4
-	"show whitespace
-	set list
-	"show tabs as '>-' and trailing whitespace as '-'
-	set listchars=tab:>-,trail:-
-	"always show status line
-	set laststatus=2
+    "show cursor position (line and column number) bottom right of screen
+    set ruler
+    "show absolute line numbers (only on current line when with relativenumber)
+    set number
+    "show line numbers relative to current line
+    set relativenumber
+    "use spaces instead of tab characters
+    set expandtab
+    "set number of characters autoindented after pressing return
+    set shiftwidth=4
+    "set number of characters indented when pressing tab
+    set tabstop=4
+    "show whitespace
+    set list
+    "show tabs as '>-' and trailing whitespace as '-'
+    set listchars=tab:>-,trail:-
+    "always show status line
+    set laststatus=2

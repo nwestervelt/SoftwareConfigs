@@ -46,21 +46,21 @@ flacFormat() {
 
     #store title
     title="$(echo "$information" | grep -i "^title")"
-    #truncate title
+    #trim title
     title="${title:6}"
 
     #store artist
     artist="$(echo "$information" | grep -i "^artist")"
-    #truncate artist
+    #trim artist
     artist="${artist:7}"
 
     #store tracknumber
     tracknumber="$(echo "$information" | grep -i "^tracknumber")"
-    #truncate tracknumber if exists
+    #trim tracknumber if exists
     if [ -n tracknumber ] ; then
         tracknumber="${tracknumber:12}"
     fi
-    move
+    moveFile
 }
 
 mp3Format() {
@@ -70,24 +70,24 @@ mp3Format() {
 
     #store title
     title="$(echo "$information" | grep -i "^tag:title=")"
-    #truncate title
+    #trim title
     title="${title:10}"
 
     #store artist
     artist="$(echo "$information" | grep -i "^tag:artist=")"
-    #truncate artist
+    #trim artist
     artist="${artist:11}"
 
     #store tracknumber
     tracknumber="$(echo "$information" | grep -i "^tag:track=")"
-    #truncate tracknumber if exists
+    #trim tracknumber if exists
     if [ -n tracknumber ] ; then
         tracknumber="${tracknumber:10}"
     fi
-    move
+    moveFile
 }
 
-move() {
+moveFile() {
     #remove leading 0's
     if [[ "$tracknumber" =~ ^0.*$ ]] ; then
         tracknumber="${tracknumber:1}"
@@ -103,6 +103,10 @@ move() {
         mv "$dir""$oldName" "$dir""$newName" &> /dev/null
         echo "Renamed \"$dir$oldName\" to \"$newName\""
     fi
+}
+
+cleanName() {
+    echo "$1" | sed 's/[\/\\:*?"<>|[:cntrl:]]/_/g'
 }
 
 #process options

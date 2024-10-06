@@ -95,18 +95,14 @@ moveFile() {
     #create file name
     newName="$(printf "%.2d - %s - %s.%s" "$tracknumber" "$artist" "$title" "$format")"
 
-    #handle '/' in file metadata
-    newName="$(echo "$newName" | sed 's/\//\-/g')"
+    #replace characters not allowed in exFAT file names with "_"
+    newName="$(echo "$newName" | sed 's/[\/\\:*?"<>|[:cntrl:]]/_/g')"
 
     #move file
     if [ "$oldName" != "$newName" ] ; then
         mv "$dir""$oldName" "$dir""$newName" &> /dev/null
         echo "Renamed \"$dir$oldName\" to \"$newName\""
     fi
-}
-
-cleanName() {
-    echo "$1" | sed 's/[\/\\:*?"<>|[:cntrl:]]/_/g'
 }
 
 #process options
